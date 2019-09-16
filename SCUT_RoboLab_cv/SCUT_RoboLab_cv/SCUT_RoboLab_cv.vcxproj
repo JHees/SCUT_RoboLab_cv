@@ -165,6 +165,16 @@
     </ClCompile>
     <ClCompile Include="SCUT_RoboLab_cv.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="armor.mp4" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sfB1.avi" />
+    <None Include="sfB2.avi" />
+    <None Include="sfR1.avi" />
+    <None Include="sfR2.avi" />
+    <None Include="sfR3.avi" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

@@ -30,4 +30,26 @@
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Media Include="armor.mp4">
+      <Filter>资源文件</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="sfB1.avi">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="sfB2.avi">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="sfR1.avi">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="sfR2.avi">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="sfR3.avi">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
 </Project>
