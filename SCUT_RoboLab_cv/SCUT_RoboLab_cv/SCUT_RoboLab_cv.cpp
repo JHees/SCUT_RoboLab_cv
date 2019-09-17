@@ -29,15 +29,11 @@ int main()
 		cap >> frame;
         cv::Mat reduce;
         cv::Mat HSV;
-        cv::Mat HSV_median;
-		std::vector<cv::Mat> channels_unB, channels;
-		cv::Mat Hue, Value;
+		std::vector<cv::Mat> channels;
 		cv::Mat Hue_unB_sholded, Value_unB_sholded;
-		cv::Mat R, R_Ex;
+		cv::Mat R;
 		std::vector<std::vector<cv::Point>> contours,contours_Tar;
 		std::vector<cv::Vec4i> hierarchy;
-
-		cv::Mat con(frame.rows, frame.cols, CV_8UC1, cv::Scalar(0, 0, 0));
 
 		std::cout << "Create: " << g_time.elapsed() << std::endl;
         if (frame.empty())
@@ -51,34 +47,26 @@ int main()
             boost::progress_timer t;
             colorReduce(frame, reduce, 16);
             cvtColor(reduce, HSV, cv::COLOR_BGR2HSV);
-            cv::medianBlur(HSV, HSV_median, shold_median);
-			imshow("HSV", HSV);
-            std::cout << "colorReduce and Blur: ";
+            std::cout << "colorReduce: ";
         }
-
-
 		
 		{
 			boost::progress_timer t;
-			split(HSV, channels_unB);
-			split(HSV_median, channels);
-			
-			myShold(channels_unB[0], Hue_unB_sholded, [](int i)->uchar {return TARGET(i) ? 255 : 0; });
-			myShold(channels_unB[2], Value_unB_sholded, [](int i)->uchar {return i >= 88 ? 255 : 0; });
+			split(HSV, channels);
+			myShold(channels[0], Hue_unB_sholded, [](int i)->uchar {return TARGET(i) ? 255 : 0; });
+			myShold(channels[2], Value_unB_sholded, [](int i)->uchar {return i >= 88 ? 255 : 0; });
 			R = (Hue_unB_sholded& Value_unB_sholded);
-			imshow("R", R);
 			cv::morphologyEx(R, R, cv::MORPH_CLOSE, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7, 7), cv::Point(-1, -1)));
 			cv::morphologyEx(R, R, cv::MORPH_OPEN, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(3, 3), cv::Point(-1, -1)));
 			cv::threshold(R, R, 1, 255, cv::THRESH_BINARY);
-
-			cv::morphologyEx(R, R_Ex, cv::MORPH_DILATE, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7, 7), cv::Point(-1, -1)));
-			cv::medianBlur(R_Ex, R_Ex, 9);
-			cv::morphologyEx(R_Ex, R_Ex, cv::MORPH_ERODE, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5), cv::Point(-1, -1)));
+			cv::morphologyEx(R, R, cv::MORPH_DILATE, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(7, 7), cv::Point(-1, -1)));
+			cv::medianBlur(R, R, 9);
+			cv::morphologyEx(R, R, cv::MORPH_ERODE, cv::getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5), cv::Point(-1, -1)));
 			std::cout << "morphology: ";
 		}
 		{
 			boost::progress_timer t;
-			cv::findContours(R_Ex, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_TC89_KCOS);
+			cv::findContours(R, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_TC89_KCOS);
 			for (std::vector<cv::Vec4i>::iterator i = hierarchy.begin(); i != hierarchy.end(); ++i)
 			{
 				if (i->val[0] == -1 && i->val[1] == -1 && i->val[2] == -1 && i->val[3] != -1)
@@ -94,8 +82,6 @@ int main()
 			std::cout << "error Targer." << std::endl;
 			continue;
 		}
-
-		
 			cv::Point2d center(0, 0);
 			cv::RotatedRect rRect = cv::minAreaRect(contours_Tar[0]);
 			cv::Point2f vertices[4];
@@ -114,7 +100,6 @@ int main()
 		//imshow("R", R);
         //imshow("R_Ex", R_Ex);
 		imshow("op", frame);
-      
 		std::cout << "Center: " << center.x << "," << center.y << std::endl << std::endl;
 		std::cout << "global time: " << g_time.elapsed() << std::endl;;
         cv::waitKey((30-1000*g_time.elapsed())>0? (30 - 1000*g_time.elapsed()):1);
