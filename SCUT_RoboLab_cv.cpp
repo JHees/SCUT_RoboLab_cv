@@ -1,7 +1,7 @@
 ﻿
 #include "Functions.h"
 #include <iostream>
-#include <opencv2/opencv.hpp>
+#include <opencv.hpp>
 #include <boost/progress.hpp>
 #include <vector>
 #define is_Red(i) ((i>156)||(i<10))
@@ -33,8 +33,10 @@ int main()
 		cv::Mat R;
 		std::vector<std::vector<cv::Point>> contours,contours_Tar;
 		std::vector<cv::Vec4i> hierarchy;
-
+		
+		#ifdef Debug
 		std::cout << "Create: " << g_time.elapsed() << std::endl;
+		#endif
         if (frame.empty())
         {
             cap.release();
@@ -43,14 +45,20 @@ int main()
         }
         
         {
-            boost::progress_timer t;
+			#ifdef Debug
+			boost::progress_timer t;
+			#endif
             colorReduce(frame, reduce, 16);
             cvtColor(reduce, HSV, cv::COLOR_BGR2HSV);
+			#ifdef Debug
             std::cout << "colorReduce: ";
-        }
+			#endif
+		}
 		
 		{
+			#ifdef Debug
 			boost::progress_timer t;
+			#endif
 			split(HSV, channels);
 			myShold(channels[0], Hue_unB_sholded, [](int i)->uchar {return TARGET(i) ? 255 : 0; });
 			myShold(channels[2], Value_unB_sholded, [](int i)->uchar {return i >= 88 ? 255 : 0; });
@@ -64,7 +72,9 @@ int main()
 			std::cout << "morphology: ";
 		}
 		{
+			#ifdef Debug
 			boost::progress_timer t;
+			#endif
 			cv::findContours(R, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_TC89_KCOS);
 			for (std::vector<cv::Vec4i>::iterator i = hierarchy.begin(); i != hierarchy.end(); ++i)
 			{
@@ -73,7 +83,9 @@ int main()
 					contours_Tar.push_back(contours[std::distance(hierarchy.begin(), i)]);
 				}
 			}
+			#ifdef Debug
 			std::cout << "findContours: ";
+			#endif
 		}
 		
 		if (contours_Tar.size() != 1)
