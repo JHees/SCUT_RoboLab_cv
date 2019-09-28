@@ -1,5 +1,4 @@
 ﻿
-#include "pch.h"
 #include "Functions.h"
 #include <iostream>
 #include <opencv2/opencv.hpp>
@@ -13,7 +12,7 @@
     #define TARGET(i) is_Blue(i)
 #endif
 
-constexpr auto _VEDIO = "sfB2.avi";
+constexpr auto _VEDIO = "../resource/sfB2.avi";
 int main()
 {
     cv::VideoCapture cap(_VEDIO);
